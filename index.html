@@ -12,6 +12,16 @@ body{margin:0;font-family:"Noto Sans JP",system-ui,-apple-system,"Segoe UI",sans
 #topbar{flex:0 0 auto;display:flex;align-items:baseline;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);z-index:30}
 #topbar h1{font-size:17px;margin:0;letter-spacing:.02em;white-space:nowrap}
 #topbar .period{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#contactBtn{margin-left:auto;font:inherit;font-size:13px;padding:5px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;white-space:nowrap;align-self:center}
+#contactModal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:200;padding:16px}
+#contactModal.open{display:flex}
+#contactModal .cm-box{background:#fff;border-radius:12px;max-width:480px;width:100%;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+#contactModal h2{font-size:16px;margin:0 0 6px}
+#contactModal p{font-size:13px;color:var(--sub);margin:0 0 12px;line-height:1.6}
+#contactModal textarea{width:100%;min-height:140px;font:inherit;font-size:14px;padding:10px;border:1px solid var(--line);border-radius:8px;box-sizing:border-box}
+#contactModal .cm-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+#contactModal .cm-actions button{font:inherit;font-size:14px;padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer}
+#contactModal .cm-send{background:#2563eb;color:#fff;border-color:#2563eb}
 #main{flex:1;position:relative;display:flex;min-height:0}
 #mapWrap{flex:1;position:relative;min-width:0}
 #map{position:absolute;inset:0}
@@ -103,6 +113,7 @@ section.sport h3 .count{font-weight:400}
   <header id="topbar">
     <h1>観戦マップ</h1>
     <span class="period">2026-10-15〜2027-01-15（今日から2ヶ月先まで）</span>
+    <button id="contactBtn" type="button">お問い合わせ</button>
   </header>
   <div id="main">
     <div id="mapWrap">
@@ -145,6 +156,23 @@ section.sport h3 .count{font-weight:400}
       <div id="listSub"></div>
       <div id="sports-list"></div>
     </aside>
+  </div>
+</div>
+<div id="contactModal" role="dialog" aria-modal="true" aria-labelledby="cmTitle">
+  <div class="cm-box">
+    <h2 id="cmTitle">お問い合わせ</h2>
+    <p>試合情報の誤りのご報告や、追加してほしい大会のリクエストなどをお寄せください。</p>
+    <form action="https://formsubmit.co/5e9386a7bf9e19951e6079b90a3169f7" method="POST">
+      <textarea name="message" required placeholder="内容を入力してください" aria-label="お問い合わせ内容"></textarea>
+      <input type="hidden" name="_subject" value="観戦マップへのお問い合わせ">
+      <input type="hidden" name="_next" value="https://iriyatravel.github.io/sports-watching-map/">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="text" name="_honey" style="display:none">
+      <div class="cm-actions">
+        <button type="button" id="contactCancel">キャンセル</button>
+        <button type="submit" class="cm-send">送信する</button>
+      </div>
+    </form>
   </div>
 </div>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -637,4 +665,12 @@ function applyLayoutMode() {
 }
 applyLayoutMode();
 mqMobile.addEventListener('change', applyLayoutMode);
+</script>
+<script>
+(function(){
+  var modal = document.getElementById('contactModal');
+  document.getElementById('contactBtn').addEventListener('click', function(){ modal.classList.add('open'); });
+  document.getElementById('contactCancel').addEventListener('click', function(){ modal.classList.remove('open'); });
+  modal.addEventListener('click', function(e){ if (e.target === modal) modal.classList.remove('open'); });
+})();
 </script></body></html>
