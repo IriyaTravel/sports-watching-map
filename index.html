@@ -594,21 +594,14 @@ map.on('load', () => {
   map.on('mouseleave', 'unclustered-point', () => { map.getCanvas().style.cursor = ''; });
   applyFilters();
 });
-// 開始日の変更は「期間の長さを保って全体をずらす」(2026-11-17 ユーザー要望)。
-// 例: 11/18〜11/20 で開始を 11/20 にすると 11/20〜11/22 になる。
-// 終了日が上限 (今日+2ヶ月とデータ期間の小さい方) を超える場合は、
-// 長さを保ったまま前へ寄せて、終了日が必ず上限以内に収まるようにする。
+// 開始日の変更で終了日は動かさない (2026-11-17 ユーザー要望の変更)。
+// 開始を後ろへ動かすと期間はその分狭まり、前へ動かすと広がる。
+// 開始日は終了日より後にできないので、超えたら終了日で止める。
 let prevFrom = defaultDate, prevTo = defaultDate;
 function parseDateStr(s) { const p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
 function shiftWindow(changed) {
   if (changed === 'from' && dateFromEl.value) {
-    const span = Math.round((parseDateStr(prevTo) - parseDateStr(prevFrom)) / 86400000);
-    let nf = parseDateStr(dateFromEl.value);
-    let nt = new Date(nf); nt.setDate(nt.getDate() + span);
-    if (fmtDateStr(nt) > rangeMax) { nt = parseDateStr(rangeMax); nf = new Date(nt); nf.setDate(nf.getDate() - span); }
-    if (fmtDateStr(nf) < rangeMin) { nf = parseDateStr(rangeMin); nt = new Date(nf); nt.setDate(nt.getDate() + span); }
-    dateFromEl.value = fmtDateStr(nf);
-    dateToEl.value = fmtDateStr(nt);
+    if (dateToEl.value && dateFromEl.value > dateToEl.value) dateFromEl.value = dateToEl.value;
   } else if (changed === 'to' && dateToEl.value) {
     // 終了日の変更で開始日は動かさない。開始日より前にはできないので開始日で止める
     if (dateFromEl.value && dateToEl.value < dateFromEl.value) dateToEl.value = dateFromEl.value;
