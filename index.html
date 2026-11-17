@@ -192,8 +192,40 @@ const windowEnd = '2027-01-17';
 const now = new Date();
 const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 const defaultDate = todayStr < windowStart ? windowStart : (todayStr > windowEnd ? windowEnd : todayStr);
-document.getElementById('dateFrom').value = defaultDate;
-document.getElementById('dateTo').value = defaultDate;
+const dateFromEl = document.getElementById('dateFrom');
+const dateToEl = document.getElementById('dateTo');
+dateFromEl.value = defaultDate;
+dateToEl.value = defaultDate;
+// 選択可能範囲は生成時に固定せず、閲覧者の今日 (前1ヶ月〜後2ヶ月) と
+// データ期間の交差で決める。日付が変わった後に開いても範囲が追随する。
+let rangeMin = windowStart, rangeMax = windowEnd;
+function fmtDateStr(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function addMonthsClamped(d, n) {
+  const day = d.getDate();
+  const r = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  const last = new Date(r.getFullYear(), r.getMonth() + 1, 0).getDate();
+  r.setDate(Math.min(day, last));
+  return r;
+}
+function syncDateBounds() {
+  dateFromEl.min = rangeMin;
+  dateFromEl.max = dateToEl.value || rangeMax;
+  dateToEl.min = dateFromEl.value || rangeMin;
+  dateToEl.max = rangeMax;
+}
+function refreshDateRange() {
+  const t = new Date();
+  let mn = fmtDateStr(addMonthsClamped(t, -1));
+  let mx = fmtDateStr(addMonthsClamped(t, 2));
+  if (mn < windowStart) mn = windowStart;
+  if (mx > windowEnd) mx = windowEnd;
+  if (mn > mx) mn = mx;
+  rangeMin = mn; rangeMax = mx;
+  syncDateBounds();
+}
+refreshDateRange();
+window.addEventListener('focus', refreshDateRange);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshDateRange(); });
 // スポーツのチェックボックス (データにあるスポーツを自動で並べる。色は全スポーツ共通)
 const sportNames = [...new Set(allEvents.map(e => e.sport || 'サッカー'))].sort();
 const sportChecks = document.getElementById('sportChecks');
@@ -552,8 +584,17 @@ map.on('load', () => {
   map.on('mouseleave', 'unclustered-point', () => { map.getCanvas().style.cursor = ''; });
   applyFilters();
 });
-document.getElementById('dateFrom').addEventListener('change', applyFilters);
-document.getElementById('dateTo').addEventListener('change', applyFilters);
+// 開始日を後にずらしたら終了日も追尾する (終了日を前にずらした場合も同様)
+dateFromEl.addEventListener('change', () => {
+  if (dateToEl.value && dateToEl.value < dateFromEl.value) dateToEl.value = dateFromEl.value;
+  syncDateBounds();
+  applyFilters();
+});
+dateToEl.addEventListener('change', () => {
+  if (dateFromEl.value && dateFromEl.value > dateToEl.value) dateFromEl.value = dateToEl.value;
+  syncDateBounds();
+  applyFilters();
+});
 document.getElementById('sportChecks').addEventListener('change', applyFilters);
 document.getElementById('excludeUniversity').addEventListener('change', applyFilters);
 document.getElementById('excludeHighSchool').addEventListener('change', applyFilters);
@@ -563,8 +604,9 @@ document.getElementById('uncheckAllSports').addEventListener('click', () => {
   applyFilters();
 });
 document.getElementById('clearFilters').addEventListener('click', () => {
-  document.getElementById('dateFrom').value = defaultDate;
-  document.getElementById('dateTo').value = defaultDate;
+  dateFromEl.value = defaultDate;
+  dateToEl.value = defaultDate;
+  syncDateBounds();
   document.querySelectorAll('.sport-filter').forEach(c => c.checked = true);
   document.getElementById('excludeUniversity').checked = false;
   document.getElementById('excludeHighSchool').checked = false;
