@@ -587,17 +587,30 @@ map.on('load', () => {
   map.on('mouseleave', 'unclustered-point', () => { map.getCanvas().style.cursor = ''; });
   applyFilters();
 });
-// 開始日を後にずらしたら終了日も追尾する (終了日を前にずらした場合も同様)
-dateFromEl.addEventListener('change', () => {
-  if (dateToEl.value && dateToEl.value < dateFromEl.value) dateToEl.value = dateFromEl.value;
+// 開始日の変更は「期間の長さを保って全体をずらす」(2026-11-17 ユーザー要望)。
+// 例: 11/18〜11/20 で開始を 11/20 にすると 11/20〜11/22 になる。
+// 終了日が上限 (今日+2ヶ月とデータ期間の小さい方) を超える場合は、
+// 長さを保ったまま前へ寄せて、終了日が必ず上限以内に収まるようにする。
+let prevFrom = defaultDate, prevTo = defaultDate;
+function parseDateStr(s) { const p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+function shiftWindow(changed) {
+  if (changed === 'from' && dateFromEl.value) {
+    const span = Math.round((parseDateStr(prevTo) - parseDateStr(prevFrom)) / 86400000);
+    let nf = parseDateStr(dateFromEl.value);
+    let nt = new Date(nf); nt.setDate(nt.getDate() + span);
+    if (fmtDateStr(nt) > rangeMax) { nt = parseDateStr(rangeMax); nf = new Date(nt); nf.setDate(nf.getDate() - span); }
+    if (fmtDateStr(nf) < rangeMin) { nf = parseDateStr(rangeMin); nt = new Date(nf); nt.setDate(nt.getDate() + span); }
+    dateFromEl.value = fmtDateStr(nf);
+    dateToEl.value = fmtDateStr(nt);
+  } else if (changed === 'to' && dateToEl.value) {
+    if (dateFromEl.value && dateFromEl.value > dateToEl.value) dateFromEl.value = dateToEl.value;
+  }
+  prevFrom = dateFromEl.value;
+  prevTo = dateToEl.value;
   syncDateBounds();
-  applyFilters();
-});
-dateToEl.addEventListener('change', () => {
-  if (dateFromEl.value && dateFromEl.value > dateToEl.value) dateFromEl.value = dateToEl.value;
-  syncDateBounds();
-  applyFilters();
-});
+}
+dateFromEl.addEventListener('change', () => { shiftWindow('from'); applyFilters(); });
+dateToEl.addEventListener('change', () => { shiftWindow('to'); applyFilters(); });
 document.getElementById('sportChecks').addEventListener('change', applyFilters);
 document.getElementById('tagChecks').addEventListener('change', applyFilters);
 // 「全て外す」: スポーツのチェックを全部外す (何も表示されない状態にする)。
@@ -608,6 +621,8 @@ document.getElementById('uncheckAllSports').addEventListener('click', () => {
 document.getElementById('clearFilters').addEventListener('click', () => {
   dateFromEl.value = defaultDate;
   dateToEl.value = defaultDate;
+  prevFrom = defaultDate;
+  prevTo = defaultDate;
   syncDateBounds();
   document.querySelectorAll('.sport-filter').forEach(c => c.checked = true);
   document.querySelectorAll('.tag-filter').forEach(c => c.checked = true);
