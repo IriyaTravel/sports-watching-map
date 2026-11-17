@@ -134,7 +134,7 @@ section.sport h3 .count{font-weight:400}
           </div>
         </div>
         <div class="fp-section">
-          <div class="fp-label">カテゴリ</div>
+          <div class="fp-label-row"><span class="fp-label">カテゴリ</span><button id="uncheckAllTags" type="button" class="fp-mini-btn">全て外す</button></div>
           <div class="fp-row" id="tagChecks">
             <label class="fp-exclude"><input type="checkbox" class="tag-filter" value="代表戦" checked> 代表戦</label>
             <label class="fp-exclude"><input type="checkbox" class="tag-filter" value="プロ" checked> プロ</label>
@@ -615,6 +615,10 @@ dateToEl.addEventListener('change', () => { shiftWindow('to'); applyFilters(); }
 document.getElementById('sportChecks').addEventListener('change', applyFilters);
 document.getElementById('tagChecks').addEventListener('change', applyFilters);
 // 「全て外す」: スポーツのチェックを全部外す (何も表示されない状態にする)。
+document.getElementById('uncheckAllTags').addEventListener('click', () => {
+  document.querySelectorAll('.tag-filter').forEach(c => c.checked = false);
+  applyFilters();
+});
 document.getElementById('uncheckAllSports').addEventListener('click', () => {
   document.querySelectorAll('.sport-filter').forEach(c => c.checked = false);
   applyFilters();
