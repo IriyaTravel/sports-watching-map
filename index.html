@@ -423,6 +423,7 @@ function applyFilters() {
   document.getElementById('listCount').textContent = `${filtered.length}件`;
   document.getElementById('sheetSummary').textContent = `${filtered.length}件の試合`;
   document.getElementById('listSub').textContent = `会場${filteredVenues.length}か所（${pinned}件を地図表示）・会場未定・不明${unpinned}件は一覧のみ。近い会場はまとめて表示します（数字は試合数の合計）。`;
+  syncToggleAllButtons();
 }
 // ---- 方向性A: パネル / ボトムシート / フィルターの挙動 ----
 // PCとスマホで挙動を変える。判定は幅 768px。
@@ -615,14 +616,23 @@ dateToEl.addEventListener('change', () => { shiftWindow('to'); applyFilters(); }
 document.getElementById('sportChecks').addEventListener('change', applyFilters);
 document.getElementById('tagChecks').addEventListener('change', applyFilters);
 // 「全て外す」: スポーツのチェックを全部外す (何も表示されない状態にする)。
-document.getElementById('uncheckAllTags').addEventListener('click', () => {
-  document.querySelectorAll('.tag-filter').forEach(c => c.checked = false);
+// 「全て外す」ボタンは、全部外れているとき「全てつける」に切り替わる (2026-11-17 ユーザー要望)
+function syncToggleAllButtons() {
+  [['uncheckAllSports', '.sport-filter'], ['uncheckAllTags', '.tag-filter']].forEach(([id, sel]) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    const boxes = [...document.querySelectorAll(sel)];
+    btn.textContent = boxes.length && boxes.every(c => !c.checked) ? '全てつける' : '全て外す';
+  });
+}
+function toggleAll(btnId, sel) {
+  const boxes = [...document.querySelectorAll(sel)];
+  const target = boxes.every(c => !c.checked);
+  boxes.forEach(c => c.checked = target);
   applyFilters();
-});
-document.getElementById('uncheckAllSports').addEventListener('click', () => {
-  document.querySelectorAll('.sport-filter').forEach(c => c.checked = false);
-  applyFilters();
-});
+}
+document.getElementById('uncheckAllTags').addEventListener('click', () => toggleAll('uncheckAllTags', '.tag-filter'));
+document.getElementById('uncheckAllSports').addEventListener('click', () => toggleAll('uncheckAllSports', '.sport-filter'));
 document.getElementById('clearFilters').addEventListener('click', () => {
   dateFromEl.value = defaultDate;
   dateToEl.value = defaultDate;
