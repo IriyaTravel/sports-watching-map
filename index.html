@@ -127,8 +127,8 @@ section.sport h3 .count{font-weight:400}
             <input type="date" id="dateFrom" min="2026-10-17" max="2027-01-17" value="2026-11-17"> <span class="fp-date-sep">〜</span> <input type="date" id="dateTo" min="2026-10-17" max="2027-01-17" value="2026-11-17">
           </div>
           <div class="fp-row" style="margin-top:6px;gap:6px;flex-wrap:wrap">
-            <button type="button" class="fp-mini-btn fp-preset" data-days="1">明日まで</button>
-            <button type="button" class="fp-mini-btn fp-preset" data-days="2">明後日まで</button>
+            <button type="button" class="fp-mini-btn fp-preset" data-days="1">翌日まで</button>
+            <button type="button" class="fp-mini-btn fp-preset" data-days="2">2日後まで</button>
             <button type="button" class="fp-mini-btn fp-preset" data-days="7">1週間後まで</button>
             <button type="button" class="fp-mini-btn fp-preset" data-months="1">1ヶ月後まで</button>
           </div>
@@ -218,7 +218,7 @@ function addMonthsClamped(d, n) {
 }
 function syncDateBounds() {
   dateFromEl.min = rangeMin;
-  dateFromEl.max = dateToEl.value || rangeMax;
+  dateFromEl.max = rangeMax;
   dateToEl.min = dateFromEl.value || rangeMin;
   dateToEl.max = rangeMax;
 }
