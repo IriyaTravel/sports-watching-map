@@ -38,6 +38,8 @@ body{margin:0;font-family:"Noto Sans JP",system-ui,-apple-system,"Segoe UI",sans
 #filterPanel .fp-label-row .fp-label{margin-bottom:0}
 #filterPanel .fp-mini-btn{font-size:11px;font-weight:700;color:var(--sub);background:none;border:none;cursor:pointer;padding:2px 4px}
 #filterPanel .fp-mini-btn:hover{color:var(--ink)}
+#filterPanel .fp-preset.active{color:#fff;background:#2563eb;border-radius:999px;padding:2px 8px}
+#filterPanel .fp-preset.active.deviated{color:#1e40af;background:#dbeafe}
 #filterPanel .fp-row{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
 #sportChecks{display:contents}
 #filterPanel input[type=date]{font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;flex:1;min-width:0}
@@ -602,23 +604,58 @@ let prevFrom = defaultDate, prevTo = defaultDate;
 function parseDateStr(s) { const p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
 function shiftWindow(changed) {
   if (changed === 'from' && dateFromEl.value) {
-    const span = Math.round((parseDateStr(prevTo) - parseDateStr(prevFrom)) / 86400000);
     let nf = parseDateStr(dateFromEl.value);
-    let nt = new Date(nf); nt.setDate(nt.getDate() + span);
+    let nt;
+    if (activePreset) {
+      // プリセットの期間の長さを維持する (1ヶ月後は月単位で数える)
+      nt = activePreset.months ? addMonthsClamped(nf, activePreset.months)
+                               : new Date(nf.getFullYear(), nf.getMonth(), nf.getDate() + activePreset.days);
+    } else {
+      const span = Math.round((parseDateStr(prevTo) - parseDateStr(prevFrom)) / 86400000);
+      nt = new Date(nf); nt.setDate(nt.getDate() + span);
+    }
     if (fmtDateStr(nt) > rangeMax) nt = parseDateStr(rangeMax);
-    if (fmtDateStr(nf) < rangeMin) { nf = parseDateStr(rangeMin); nt = new Date(nf); nt.setDate(nt.getDate() + span); if (fmtDateStr(nt) > rangeMax) nt = parseDateStr(rangeMax); }
+    if (fmtDateStr(nf) < rangeMin) { nf = parseDateStr(rangeMin); nt = new Date(nf); nt.setDate(nt.getDate() + (activePreset ? 0 : Math.round((parseDateStr(prevTo) - parseDateStr(prevFrom)) / 86400000))); if (activePreset) { nt = activePreset.months ? addMonthsClamped(nf, activePreset.months) : new Date(nf.getFullYear(), nf.getMonth(), nf.getDate() + activePreset.days); } if (fmtDateStr(nt) > rangeMax) nt = parseDateStr(rangeMax); }
     dateFromEl.value = fmtDateStr(nf);
     dateToEl.value = fmtDateStr(nt);
   } else if (changed === 'to' && dateToEl.value) {
     // 終了日の変更で開始日は動かさない。開始日より前にはできないので開始日で止める
     if (dateFromEl.value && dateToEl.value < dateFromEl.value) dateToEl.value = dateFromEl.value;
+    // 終了日を手で変えたらプリセットの期間維持は終わり (ハイライトを消す)
+    activePreset = null;
   }
   prevFrom = dateFromEl.value;
   prevTo = dateToEl.value;
   syncDateBounds();
+  syncPresetUI();
 }
 // ワンクリックで範囲を設定するプリセット (2026-11-17 ユーザー要望)。
-// 開始は今日、終了は 明日/明後日/1週間後/1ヶ月後。上限・下限で丸める。
+// 押したプリセットは選択中として色を付ける。その後、開始日を動かしても
+// プリセットの期間の長さは維持されるが、元の範囲からずれたら色を薄くして
+// 「ずれている」ことを示す。終了日を手で変える/クリアすると選択は外れる。
+let activePreset = null;   // {days: n} または {months: n}
+let presetAnchor = '';     // プリセットを押したときの開始日 (元の範囲の基準)
+function presetCanonical() {
+  const a = parseDateStr(presetAnchor);
+  let to = activePreset.months ? addMonthsClamped(a, activePreset.months)
+                               : new Date(a.getFullYear(), a.getMonth(), a.getDate() + activePreset.days);
+  let toStr = fmtDateStr(to);
+  if (toStr > rangeMax) toStr = rangeMax;
+  return [presetAnchor, toStr];
+}
+function syncPresetUI() {
+  document.querySelectorAll('.fp-preset').forEach(btn => {
+    const mine = activePreset && ((activePreset.days && Number(btn.dataset.days) === activePreset.days) ||
+                                  (activePreset.months && Number(btn.dataset.months) === activePreset.months));
+    btn.classList.toggle('active', !!mine);
+    let deviated = false;
+    if (mine) {
+      const [cf, ct] = presetCanonical();
+      deviated = dateFromEl.value !== cf || dateToEl.value !== ct;
+    }
+    btn.classList.toggle('deviated', deviated);
+  });
+}
 document.querySelectorAll('.fp-preset').forEach(btn => btn.addEventListener('click', () => {
   const t = new Date();
   let end;
@@ -632,7 +669,10 @@ document.querySelectorAll('.fp-preset').forEach(btn => btn.addEventListener('cli
   dateToEl.value = toStr;
   prevFrom = fromStr;
   prevTo = toStr;
+  activePreset = btn.dataset.months ? { months: Number(btn.dataset.months) } : { days: Number(btn.dataset.days) };
+  presetAnchor = fromStr;
   syncDateBounds();
+  syncPresetUI();
   applyFilters();
 }));
 dateFromEl.addEventListener('change', () => { shiftWindow('from'); applyFilters(); });
@@ -662,7 +702,9 @@ document.getElementById('clearFilters').addEventListener('click', () => {
   dateToEl.value = defaultDate;
   prevFrom = defaultDate;
   prevTo = defaultDate;
+  activePreset = null;
   syncDateBounds();
+  syncPresetUI();
   document.querySelectorAll('.sport-filter').forEach(c => c.checked = true);
   document.querySelectorAll('.tag-filter').forEach(c => c.checked = true);
   applyFilters();
