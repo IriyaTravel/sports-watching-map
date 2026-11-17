@@ -129,6 +129,7 @@ section.sport h3 .count{font-weight:400}
             <input type="date" id="dateFrom" min="2026-10-17" max="2027-01-17" value="2026-11-17"> <span class="fp-date-sep">〜</span> <input type="date" id="dateTo" min="2026-10-17" max="2027-01-17" value="2026-11-17">
           </div>
           <div class="fp-row" style="margin-top:6px;gap:6px;flex-wrap:wrap">
+            <button type="button" class="fp-mini-btn fp-preset" data-days="0">1日のみ</button>
             <button type="button" class="fp-mini-btn fp-preset" data-days="1">翌日まで</button>
             <button type="button" class="fp-mini-btn fp-preset" data-days="2">2日後まで</button>
             <button type="button" class="fp-mini-btn fp-preset" data-days="7">1週間後まで</button>
@@ -631,27 +632,23 @@ function shiftWindow(changed) {
 }
 // ワンクリックで範囲を設定するプリセット (2026-11-17 ユーザー要望)。
 // 押したプリセットは選択中として色を付ける。その後、開始日を動かしても
-// プリセットの期間の長さは維持されるが、元の範囲からずれたら色を薄くして
-// 「ずれている」ことを示す。終了日を手で変える/クリアすると選択は外れる。
+// プリセットの期間の長さは維持され、色は付いたままになる。上限で終了日が
+// 止められて長さが狭まったときだけ色を薄くする。終了日を手で変える/
+// クリアすると選択は外れる。
 let activePreset = null;   // {days: n} または {months: n}
-let presetAnchor = '';     // プリセットを押したときの開始日 (元の範囲の基準)
-function presetCanonical() {
-  const a = parseDateStr(presetAnchor);
-  let to = activePreset.months ? addMonthsClamped(a, activePreset.months)
-                               : new Date(a.getFullYear(), a.getMonth(), a.getDate() + activePreset.days);
-  let toStr = fmtDateStr(to);
-  if (toStr > rangeMax) toStr = rangeMax;
-  return [presetAnchor, toStr];
-}
 function syncPresetUI() {
   document.querySelectorAll('.fp-preset').forEach(btn => {
-    const mine = activePreset && ((activePreset.days && Number(btn.dataset.days) === activePreset.days) ||
-                                  (activePreset.months && Number(btn.dataset.months) === activePreset.months));
+    const mine = !!activePreset && ((activePreset.days !== undefined && Number(btn.dataset.days) === activePreset.days) ||
+                                    (activePreset.months !== undefined && Number(btn.dataset.months) === activePreset.months));
     btn.classList.toggle('active', !!mine);
     let deviated = false;
-    if (mine) {
-      const [cf, ct] = presetCanonical();
-      deviated = dateFromEl.value !== cf || dateToEl.value !== ct;
+    if (mine && dateFromEl.value) {
+      // プリセットの長さがそのまま保たれていれば濃色。上限で終了日が
+      // 止められて長さが狭まったときだけ薄色にする (2026-11-17 ユーザー指示)。
+      const f = parseDateStr(dateFromEl.value);
+      const expected = activePreset.months ? addMonthsClamped(f, activePreset.months)
+                                           : new Date(f.getFullYear(), f.getMonth(), f.getDate() + activePreset.days);
+      deviated = dateToEl.value !== fmtDateStr(expected);
     }
     btn.classList.toggle('deviated', deviated);
   });
@@ -670,7 +667,6 @@ document.querySelectorAll('.fp-preset').forEach(btn => btn.addEventListener('cli
   prevFrom = fromStr;
   prevTo = toStr;
   activePreset = btn.dataset.months ? { months: Number(btn.dataset.months) } : { days: Number(btn.dataset.days) };
-  presetAnchor = fromStr;
   syncDateBounds();
   syncPresetUI();
   applyFilters();
