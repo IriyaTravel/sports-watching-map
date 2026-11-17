@@ -603,7 +603,8 @@ function shiftWindow(changed) {
     dateFromEl.value = fmtDateStr(nf);
     dateToEl.value = fmtDateStr(nt);
   } else if (changed === 'to' && dateToEl.value) {
-    if (dateFromEl.value && dateFromEl.value > dateToEl.value) dateFromEl.value = dateToEl.value;
+    // 終了日の変更で開始日は動かさない。開始日より前にはできないので開始日で止める
+    if (dateFromEl.value && dateToEl.value < dateFromEl.value) dateToEl.value = dateFromEl.value;
   }
   prevFrom = dateFromEl.value;
   prevTo = dateToEl.value;
