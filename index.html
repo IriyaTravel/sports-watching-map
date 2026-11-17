@@ -126,6 +126,12 @@ section.sport h3 .count{font-weight:400}
           <div class="fp-row">
             <input type="date" id="dateFrom" min="2026-10-17" max="2027-01-17" value="2026-11-17"> <span class="fp-date-sep">〜</span> <input type="date" id="dateTo" min="2026-10-17" max="2027-01-17" value="2026-11-17">
           </div>
+          <div class="fp-row" style="margin-top:6px;gap:6px;flex-wrap:wrap">
+            <button type="button" class="fp-mini-btn fp-preset" data-days="1">明日まで</button>
+            <button type="button" class="fp-mini-btn fp-preset" data-days="2">明後日まで</button>
+            <button type="button" class="fp-mini-btn fp-preset" data-days="7">1週間後まで</button>
+            <button type="button" class="fp-mini-btn fp-preset" data-months="1">1ヶ月後まで</button>
+          </div>
         </div>
         <div class="fp-section">
           <div class="fp-label-row"><span class="fp-label">スポーツ</span><button id="uncheckAllSports" type="button" class="fp-mini-btn">全て外す</button></div>
@@ -611,6 +617,24 @@ function shiftWindow(changed) {
   prevTo = dateToEl.value;
   syncDateBounds();
 }
+// ワンクリックで範囲を設定するプリセット (2026-11-17 ユーザー要望)。
+// 開始は今日、終了は 明日/明後日/1週間後/1ヶ月後。上限・下限で丸める。
+document.querySelectorAll('.fp-preset').forEach(btn => btn.addEventListener('click', () => {
+  const t = new Date();
+  let end;
+  if (btn.dataset.months) { end = addMonthsClamped(t, Number(btn.dataset.months)); }
+  else { end = new Date(t.getFullYear(), t.getMonth(), t.getDate() + Number(btn.dataset.days)); }
+  let fromStr = fmtDateStr(t), toStr = fmtDateStr(end);
+  if (fromStr < rangeMin) fromStr = rangeMin;
+  if (toStr > rangeMax) toStr = rangeMax;
+  if (fromStr > toStr) fromStr = toStr;
+  dateFromEl.value = fromStr;
+  dateToEl.value = toStr;
+  prevFrom = fromStr;
+  prevTo = toStr;
+  syncDateBounds();
+  applyFilters();
+}));
 dateFromEl.addEventListener('change', () => { shiftWindow('from'); applyFilters(); });
 dateToEl.addEventListener('change', () => { shiftWindow('to'); applyFilters(); });
 document.getElementById('sportChecks').addEventListener('change', applyFilters);
