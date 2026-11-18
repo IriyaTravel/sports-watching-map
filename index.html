@@ -50,6 +50,7 @@ body{margin:0;font-family:"Noto Sans JP",system-ui,-apple-system,"Segoe UI",sans
 #filterPanel .fp-mini-btn{font-size:11px;font-weight:700;color:var(--sub);background:none;border:none;cursor:pointer;padding:2px 4px}
 #filterPanel .fp-mini-btn:hover{color:var(--ink)}
 #filterPanel .fp-preset.active{color:#fff;background:#2563eb;border-radius:999px;padding:2px 8px}
+.fp-range-note{font-size:11px;color:#6b7280;margin-top:6px}
 #siteFooter{position:fixed;left:10px;bottom:10px;z-index:5;max-width:min(520px,72vw);background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:11px;line-height:1.5;color:var(--ink)}
 #siteFooter a{color:#2563eb}
 #filterPanel .fp-preset.active.deviated{color:#1e40af;background:#dbeafe}
@@ -149,6 +150,7 @@ section.sport h3 .count{font-weight:400}
             <button type="button" class="fp-mini-btn fp-preset" data-days="7">1週間後まで</button>
             <button type="button" class="fp-mini-btn fp-preset" data-months="1">1ヶ月後まで</button>
           </div>
+          <div class="fp-range-note" id="dateRangeNote"></div>
         </div>
         <div class="fp-section">
           <div class="fp-label-row"><span class="fp-label">スポーツ</span><button id="uncheckAllSports" type="button" class="fp-mini-btn">全て外す</button></div>
@@ -247,6 +249,11 @@ function refreshDateRange() {
   if (mx > windowEnd) mx = windowEnd;
   if (mn > mx) mn = mx;
   rangeMin = mn; rangeMax = mx;
+  const noteEl = document.getElementById('dateRangeNote');
+  if (noteEl) {
+    const jp = s => { const [y, m, d] = s.split('-').map(Number); return y + '年' + m + '月' + d + '日'; };
+    noteEl.textContent = jp(rangeMin) + 'から' + jp(rangeMax) + 'まで表示できます';
+  }
   syncDateBounds();
 }
 refreshDateRange();
