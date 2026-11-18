@@ -251,7 +251,7 @@ function refreshDateRange() {
   const noteEl = document.getElementById('dateRangeNote');
   if (noteEl) {
     const jp = s => { const [y, m, d] = s.split('-').map(Number); return y + '年' + m + '月' + d + '日'; };
-    noteEl.textContent = '（' + jp(rangeMin) + 'から' + jp(rangeMax) + 'まで表示できます）';
+    noteEl.textContent = '（' + jp(rangeMin) + '～' + jp(rangeMax) + '）';
   }
   syncDateBounds();
 }
