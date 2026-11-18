@@ -50,7 +50,7 @@ body{margin:0;font-family:"Noto Sans JP",system-ui,-apple-system,"Segoe UI",sans
 #filterPanel .fp-mini-btn{font-size:11px;font-weight:700;color:var(--sub);background:none;border:none;cursor:pointer;padding:2px 4px}
 #filterPanel .fp-mini-btn:hover{color:var(--ink)}
 #filterPanel .fp-preset.active{color:#fff;background:#2563eb;border-radius:999px;padding:2px 8px}
-.fp-range-note{font-size:11px;color:#6b7280;margin-top:6px}
+.fp-range-note-inline{font-size:11px;color:#6b7280;font-weight:400}
 #siteFooter{position:fixed;left:10px;bottom:10px;z-index:5;max-width:min(520px,72vw);background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:11px;line-height:1.5;color:var(--ink)}
 #siteFooter a{color:#2563eb}
 #filterPanel .fp-preset.active.deviated{color:#1e40af;background:#dbeafe}
@@ -139,11 +139,10 @@ section.sport h3 .count{font-weight:400}
       <div id="filterPanel">
         <div class="fp-head"><b>フィルター</b><button id="filterClose" type="button" aria-label="フィルターを閉じる">×</button></div>
         <div class="fp-section">
-          <div class="fp-label">日付</div>
+          <div class="fp-label">日付 <span class="fp-range-note-inline" id="dateRangeNote"></span></div>
           <div class="fp-row">
             <input type="date" id="dateFrom" min="2026-10-18" max="2027-01-18" value="2026-11-18"> <span class="fp-date-sep">〜</span> <input type="date" id="dateTo" min="2026-10-18" max="2027-01-18" value="2026-11-18">
           </div>
-          <div class="fp-range-note" id="dateRangeNote"></div>
           <div class="fp-row" style="margin-top:6px;gap:6px;flex-wrap:wrap">
             <button type="button" class="fp-mini-btn fp-preset" data-days="0">1日のみ</button>
             <button type="button" class="fp-mini-btn fp-preset" data-days="1">翌日まで</button>
@@ -252,7 +251,7 @@ function refreshDateRange() {
   const noteEl = document.getElementById('dateRangeNote');
   if (noteEl) {
     const jp = s => { const [y, m, d] = s.split('-').map(Number); return y + '年' + m + '月' + d + '日'; };
-    noteEl.textContent = jp(rangeMin) + 'から' + jp(rangeMax) + 'まで表示できます';
+    noteEl.textContent = '（' + jp(rangeMin) + 'から' + jp(rangeMax) + 'まで表示できます）';
   }
   syncDateBounds();
 }
