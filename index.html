@@ -202,11 +202,16 @@ section.sport h3 .count{font-weight:400}
         <button id="listClose" type="button" aria-label="一覧を閉じる">×</button>
       </div>
       <div id="listSub"></div>
-      <div class="admax-slot">
-<!-- admax -->
-<script src="https://adm.shinobi.jp/s/1a612c2ec57c62350ff9cdc4730d4765"></script>
-<!-- admax -->
-</div>
+      <div class="admax-slot" id="admaxSlot"></div>
+<script>
+(function(){
+  var s = document.createElement('script');
+  s.src = window.matchMedia('(max-width: 767px)').matches
+    ? 'https://adm.shinobi.jp/s/7dc6603360b8ee2e22a4b2642c42b067'
+    : 'https://adm.shinobi.jp/s/1a612c2ec57c62350ff9cdc4730d4765';
+  document.getElementById('admaxSlot').appendChild(s);
+})();
+</script>
       <div id="sports-list"></div>
     </aside>
   </div>
