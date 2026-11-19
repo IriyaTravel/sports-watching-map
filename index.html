@@ -51,6 +51,26 @@ body{margin:0;font-family:"Noto Sans JP",system-ui,-apple-system,"Segoe UI",sans
 #filterPanel .fp-mini-btn:hover{color:var(--ink)}
 #filterPanel .fp-preset.active{color:#fff;background:#2563eb;border-radius:999px;padding:2px 8px}
 .fp-range-note-inline{font-size:11px;color:#6b7280;font-weight:400}
+#cover{position:fixed;inset:0;z-index:90;background:#f1f5f9;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#cover.hidden{display:none}
+.cover-wrap{max-width:840px;margin:0 auto;padding:26px 18px 60px}
+.cover-hero{background:#2563eb;color:#fff;border-radius:16px;padding:26px 22px;margin-bottom:16px}
+.cover-hero h1{font-size:30px;margin:0 0 8px}
+.cover-hero p{margin:0;font-size:14px;line-height:1.8;opacity:.96}
+.cover-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+.cover-card h2{font-size:16px;margin:0 0 10px}
+.cover-form{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.cover-form label{font-size:12px;color:var(--sub);display:flex;flex-direction:column;gap:4px;font-weight:600}
+.cover-form input,.cover-form select{font-size:14px;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+.cover-go{background:#2563eb;color:#fff;border:none;font-size:15px;font-weight:700;padding:10px 24px;border-radius:999px;cursor:pointer}
+.cover-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.cover-chip{border:1px solid #2563eb;color:#2563eb;background:#fff;border-radius:999px;padding:5px 14px;font-size:13px;cursor:pointer}
+.cover-pickup{list-style:none;margin:0;padding:0;font-size:13px;line-height:1.6}
+.cover-pickup li{padding:7px 0;border-bottom:1px solid var(--line)}
+.cover-pickup li:last-child{border-bottom:none}
+.cover-sports{columns:2;font-size:14px;line-height:2.1;list-style:none;margin:0;padding:0}
+@media (max-width:640px){.cover-sports{columns:1}}
+.cover-note{font-size:13px;color:var(--sub);line-height:1.9;margin:0}
 #siteFooter{position:fixed;left:10px;bottom:10px;z-index:5;max-width:min(520px,72vw);background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:11px;line-height:1.5;color:var(--ink)}
 #siteFooter a{color:#2563eb}
 #filterPanel .fp-preset.active.deviated{color:#1e40af;background:#dbeafe}
@@ -125,11 +145,40 @@ section.sport h3 .count{font-weight:400}
   #listToggle{display:none !important}
 }</style>
 </head><body>
+<div id="cover"><div class="cover-wrap">
+<div class="cover-hero"><h1>観戦マップ</h1>
+<p>日本全国のスポーツ観戦イベントを地図で探せるサイトです。プロリーグから大学・高校の大会まで、現在約7,370件の試合を掲載中。「応援するチームはないけど、近くで何か観たい」というときに、場所と日付から観に行ける試合が見つかります。</p></div>
+<div class="cover-card"><h2>試合を探す</h2>
+<form class="cover-form" id="coverForm">
+<label>日付<input type="date" id="covDate" value="2026-11-19"></label>
+<label>スポーツ<select id="covSport"><option value="">すべて</option><option value="アイスホッケー">アイスホッケー</option><option value="アメリカンフットボール">アメリカンフットボール</option><option value="サッカー">サッカー</option><option value="ソフトボール">ソフトボール</option><option value="テニス">テニス</option><option value="ハンドボール">ハンドボール</option><option value="バスケットボール">バスケットボール</option><option value="バドミントン">バドミントン</option><option value="バレーボール">バレーボール</option><option value="フィールドホッケー">フィールドホッケー</option><option value="フットサル">フットサル</option><option value="ラクロス">ラクロス</option><option value="ラグビー">ラグビー</option><option value="卓球">卓球</option><option value="野球">野球</option></select></label>
+<label>カテゴリ<select id="covTag"><option value="">すべて</option><option value="代表戦">代表戦</option><option value="プロ">プロ</option><option value="セミプロ・社会人">セミプロ・社会人</option><option value="大学">大学</option><option value="高校・高専">高校・高専</option></select></label>
+<button type="submit" class="cover-go">地図で探す</button>
+</form>
+<div class="cover-chips">
+<button type="button" class="cover-chip" data-kind="today">今日の試合</button>
+<button type="button" class="cover-chip" data-kind="weekend">今週末</button>
+<button type="button" class="cover-chip" data-kind="week">1週間後まで</button>
+</div>
+<p class="cover-note" style="margin-top:12px">表示できる期間は 2026-10-19〜2027-01-19（今日から2ヶ月先まで） です。</p>
+</div>
+<div class="cover-card"><h2>11月19日（木）の試合ピックアップ</h2>
+<ul class="cover-pickup"><li>08:30 明治神宮野球大会高校の部 仙台育英 vs 鹿児島城西 ＠明治神宮野球場</li><li>10:00 ITFワールドテニスマスターズツアー世界選手権2026東京（30歳・35歳） 対戦カード複数 ＠有明テニスの森公園</li><li>11:00 2026兵庫ノアチャレンジャー（ATP Challenger 75） 男子シングルス2回戦 ＠ブルボンビーンズドーム</li><li>11:00 明治神宮野球大会高校の部 北海 vs 創志学園 ＠明治神宮野球場</li><li>13:30 明治神宮野球大会大学の部 中京大学 vs 筑波大学 ＠明治神宮野球場</li><li>16:00 明治神宮野球大会大学の部 環太平洋大学 vs 神戸医療未来大学 ＠明治神宮野球場</li><li>18:00 WEリーグ RB大宮アルディージャWOMEN vs INAC神戸レオネッサ ＠NACK5スタジアム大宮</li><li>19:00 日米対抗ソフトボール2026 日本 vs アメリカ ＠バンテリンドーム ナゴヤ</li><li>20:30 関西学生アイスホッケーリーグ 順位決定リーグ 京都大学 vs 桃山学院大学 ＠関西大学たかつきアイスアリーナ</li><li>22:15 Sリーグ 電通 vs 神宮MS ＠ダイドードリンコアイスアリーナ</li><li>時間未定・不明 ITF Juniors in Japan U18 Week 1・Week 2（ITF Junior） シングルス準決勝 ＠Hotel &amp; Tennis Resort Club Verde</li><li>時間未定・不明 全国高等学校選抜バドミントン大会 都道府県予選 選抜予選(新人大会) 団体戦 準決勝・決勝 ＠深谷ビッグタートル</li></ul>
+<p style="margin:12px 0 0"><button type="button" class="cover-go" id="pickupGo" data-date="2026-11-19">この日の試合を地図で全部見る</button></p>
+</div>
+<div class="cover-card"><h2>スポーツから探す</h2>
+<ul class="cover-sports"><li><a href="/sports/icehockey.html">アイスホッケーの試合一覧</a>（327件）</li><li><a href="/sports/americanfootball.html">アメリカンフットボールの試合一覧</a>（253件）</li><li><a href="/sports/soccer.html">サッカーの試合一覧</a>（1387件）</li><li><a href="/sports/softball.html">ソフトボールの試合一覧</a>（148件）</li><li><a href="/sports/tennis.html">テニスの試合一覧</a>（284件）</li><li><a href="/sports/handball.html">ハンドボールの試合一覧</a>（175件）</li><li><a href="/sports/basketball.html">バスケットボールの試合一覧</a>（1465件）</li><li><a href="/sports/badminton.html">バドミントンの試合一覧</a>（213件）</li><li><a href="/sports/volleyball.html">バレーボールの試合一覧</a>（928件）</li><li><a href="/sports/fieldhockey.html">フィールドホッケーの試合一覧</a>（229件）</li><li><a href="/sports/futsal.html">フットサルの試合一覧</a>（468件）</li><li><a href="/sports/lacrosse.html">ラクロスの試合一覧</a>（124件）</li><li><a href="/sports/rugby.html">ラグビーの試合一覧</a>（626件）</li><li><a href="/sports/tabletennis.html">卓球の試合一覧</a>（265件）</li><li><a href="/sports/baseball.html">野球の試合一覧</a>（478件）</li></ul>
+</div>
+<div class="cover-card"><h2>観戦マップについて</h2>
+<p class="cover-note">日程・対戦カード・会場は、各リーグ・主催団体の公式発表をもとに収集し、毎日更新しています。公式に発表されていない項目は「未定・不明」と明示しています。地図上のピンは会場を表し、数字はその会場の試合件数です。詳しくは<a href="about.html">観戦マップについて</a>をご覧ください。チケットの販売は行っていません。購入は各主催者の公式サイトでお願いします。</p>
+</div>
+<p class="cover-note"><a href="about.html">観戦マップについて</a> / <a href="privacy.html">プライバシーポリシー</a> / お問い合わせは地図ページ右上のボタンから</p>
+</div></div>
 <div id="app">
-  <footer id="siteFooter">観戦マップは、日本全国のスポーツ観戦イベントを地図で探せるサイトです。日程・会場は各主催者の公式情報でご確認ください。 <a href="privacy.html">プライバシーポリシー</a></footer>
+  <footer id="siteFooter">観戦マップは、日本全国のスポーツ観戦イベントを地図で探せるサイトです。日程・会場は各主催者の公式情報でご確認ください。 <a href="#" id="toCover">トップ</a> <a href="about.html">観戦マップについて</a> <a href="privacy.html">プライバシーポリシー</a></footer>
   <header id="topbar">
     <h1>観戦マップ</h1>
-    <span class="period">2026-10-18〜2027-01-18（今日から2ヶ月先まで）</span>
+    <span class="period">2026-10-19〜2027-01-19（今日から2ヶ月先まで）</span>
     <button id="contactBtn" type="button">お問い合わせ</button>
   </header>
   <div id="main">
@@ -141,7 +190,7 @@ section.sport h3 .count{font-weight:400}
         <div class="fp-section">
           <div class="fp-label">日付 <span class="fp-range-note-inline" id="dateRangeNote"></span></div>
           <div class="fp-row">
-            <input type="date" id="dateFrom" min="2026-10-18" max="2027-01-18" value="2026-11-18"> <span class="fp-date-sep">〜</span> <input type="date" id="dateTo" min="2026-10-18" max="2027-01-18" value="2026-11-18">
+            <input type="date" id="dateFrom" min="2026-10-19" max="2027-01-19" value="2026-11-19"> <span class="fp-date-sep">〜</span> <input type="date" id="dateTo" min="2026-10-19" max="2027-01-19" value="2026-11-19">
           </div>
           <div class="fp-row" style="margin-top:6px;gap:6px;flex-wrap:wrap">
             <button type="button" class="fp-mini-btn fp-preset" data-days="0">1日のみ</button>
@@ -213,8 +262,8 @@ const map = new maplibregl.Map({
   zoom: 5
 });
 map.addControl(new maplibregl.NavigationControl(), 'top-right');
-const windowStart = '2026-10-18';
-const windowEnd = '2027-01-18';
+const windowStart = '2026-10-19';
+const windowEnd = '2027-01-19';
 // 日付のデフォルトは今日〜今日 (閲覧者の今日。ウィンドウ内に収める)
 const now = new Date();
 const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -674,7 +723,9 @@ function syncPresetUI() {
   });
 }
 document.querySelectorAll('.fp-preset').forEach(btn => btn.addEventListener('click', () => {
-  const t = new Date();
+  // プリセットは「いま選ばれている開始日」を起点にする (開始日を今日へ戻さない。2026-11-19 user 指示)
+  let t = new Date();
+  if (dateFromEl.value) { const [py, pm, pd] = dateFromEl.value.split('-').map(Number); t = new Date(py, pm - 1, pd); }
   let end;
   if (btn.dataset.months) { end = addMonthsClamped(t, Number(btn.dataset.months)); }
   else { end = new Date(t.getFullYear(), t.getMonth(), t.getDate() + Number(btn.dataset.days)); }
@@ -829,4 +880,43 @@ mqMobile.addEventListener('change', applyLayoutMode);
   modal.addEventListener('click', function(e){ if (e.target === modal) modal.classList.remove('open'); });
 })();
 </script><!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8537cc9805364768ab20ee783dbd1d3f"}'></script><!-- End Cloudflare Web Analytics -->
+<script>
+(function(){
+  var cover = document.getElementById('cover');
+  if (!cover) return;
+  function hideCover(){ cover.classList.add('hidden'); }
+  function showCover(){ cover.classList.remove('hidden'); cover.scrollTop = 0; }
+  if (location.hash === '#map') hideCover();
+  var toCover = document.getElementById('toCover');
+  if (toCover) toCover.addEventListener('click', function(e){ e.preventDefault(); showCover(); });
+  function fmt(d){ var y=d.getFullYear(), m=('0'+(d.getMonth()+1)).slice(-2), dd=('0'+d.getDate()).slice(-2); return y+'-'+m+'-'+dd; }
+  function setDates(from, to){
+    var df = document.getElementById('dateFrom'), dt = document.getElementById('dateTo');
+    df.value = from; df.dispatchEvent(new Event('change'));
+    dt.value = to; dt.dispatchEvent(new Event('change'));
+  }
+  function setSport(sport){
+    document.querySelectorAll('.sport-filter').forEach(function(cb){ cb.checked = (!sport || cb.value === sport); });
+  }
+  function setTag(tag){
+    document.querySelectorAll('.tag-filter').forEach(function(cb){ cb.checked = (!tag || cb.value === tag); });
+  }
+  function go(from, to, sport, tag){
+    setSport(sport); setTag(tag); setDates(from, to);
+    if (window.applyFilters) applyFilters();
+    hideCover();
+  }
+  var form = document.getElementById('coverForm');
+  if (form) form.addEventListener('submit', function(e){ e.preventDefault(); var d = document.getElementById('covDate').value || fmt(new Date()); go(d, d, document.getElementById('covSport').value, document.getElementById('covTag').value); });
+  document.querySelectorAll('.cover-chip').forEach(function(chip){ chip.addEventListener('click', function(){
+    var kind = chip.getAttribute('data-kind'); var t = new Date(); var from, to;
+    if (kind === 'today') { from = to = fmt(t); }
+    else if (kind === 'week') { from = fmt(t); var e2 = new Date(t); e2.setDate(e2.getDate()+7); to = fmt(e2); }
+    else { var dow = t.getDay(); var sat = new Date(t); sat.setDate(sat.getDate() + (dow === 0 ? -1 : 6 - dow)); var sun = new Date(sat); sun.setDate(sun.getDate()+1); from = fmt(sat); to = fmt(sun); }
+    go(from, to, '', '');
+  }); });
+  var pk = document.getElementById('pickupGo');
+  if (pk) pk.addEventListener('click', function(){ var d = pk.getAttribute('data-date'); go(d, d, '', ''); });
+})();
+</script>
 </body></html>
